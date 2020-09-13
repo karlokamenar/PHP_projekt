@@ -213,12 +213,7 @@ if(isset($_POST['izv_po_datumu'])){
         echo "greska, datum moze imati samo znamenke i '-': " . $conn->error;
     }
     else{
-    $sql_od = "select od from funkcije order by od asc limit 1";
-$sql_od_date = date($sql_od);
-$sql_do = "select do from funkcije order by do desc limit 1";
-$sql_do_date = date($sql_do);
-$sad = date('Y-m-d');
-//$sql="SELECT ime,prezime,funkcija from funkcije WHERE '". $_POST['datum1'] ."'>= '". $sql_od ."' AND <= '". $sql_do ."'";
+
 $sql="SELECT DISTINCT ime,prezime,funkcija,od,do,institucija from funkcije ";
 $podaci = mysqli_query($conn, $sql);
     if ($podaci->num_rows > 0) {
@@ -227,7 +222,7 @@ $podaci = mysqli_query($conn, $sql);
   echo "<table border='1'><tr><th>funkcija</th><th>ime</th><th>prezime</th><th>od</th><th>do</th><th>institucija</th></tr>";
         
   while($row = $podaci->fetch_assoc()) {
-      if(date($_POST['datum1']) >= date($row['od']) && date($_POST['datum1']) <= date($row['do'])){
+      if(strtotime($_POST['datum1']) >= strtotime($row['od']) && strtotime($_POST['datum1']) <= strtotime($row['do'])){
     echo "<tr><td>". $row["funkcija"]."</td><td>". $row["ime"]."</td><td>". $row["prezime"]."</td><td>". $row["od"]."</td><td>". $row["do"]."</td><td>". $row["institucija"]."</td></tr>";
     
 
@@ -244,29 +239,25 @@ $podaci = mysqli_query($conn, $sql);
 }
 if(isset($_POST['izv_po_datumu_csv'])){
 
-        $sql_od = "select od from funkcije order by od asc limit 1";
-$sql_od_date = date($sql_od);
-$sql_do = "select do from funkcije order by do desc limit 1";
-$sql_do_date = date($sql_do);
-$sad = date('Y-m-d');
-//$sql="SELECT ime,prezime,funkcija from funkcije WHERE '". $_POST['datum1'] ."'>= '". $sql_od ."' AND <= '". $sql_do ."'";
-$sql="SELECT ime,prezime,funkcija,od,do,institucija from funkcije ";
+        
+$sql="SELECT DISTINCT ime,prezime,funkcija,od,do,institucija from funkcije ";
 $podaci = mysqli_query($conn, $sql);
         if ($podaci->num_rows > 0) {
     header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename=data.csv');
     $output = fopen("php://output", "w");
     fputcsv($output, array('funkcija','ime','prezime','od','do','institucija'),';',' ');
-    while ($row = mysqli_fetch_assoc($podaci))
-        {
-        if(date($_POST['datum1']) >= date($row['od']) && date($_POST['datum1']) <= date($row['do'])){
+    while ($row = mysqli_fetch_assoc($podaci)){
+        
+      if(strtotime($_POST['datum1']) >= strtotime($row['od']) && strtotime($_POST['datum1']) <= strtotime($row['do'])){
         fputcsv($output, array($row['funkcija'],$row['ime'],$row['prezime'],$row['od'],$row['do'],$row['institucija']),";",' ');
                 
+        }
         }
         fclose($output);
         exit;
         }
-}
+
 }
 if(isset($_POST['izv_po_datumu_pdf'])){
 
